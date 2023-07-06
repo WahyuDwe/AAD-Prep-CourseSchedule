@@ -2,6 +2,7 @@ package com.dicoding.courseschedule.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.dicoding.courseschedule.R
 import com.dicoding.courseschedule.data.Course
+import com.dicoding.courseschedule.ui.add.AddCourseActivity
 import com.dicoding.courseschedule.ui.list.ListActivity
 import com.dicoding.courseschedule.ui.list.ListViewModelFactory
 import com.dicoding.courseschedule.ui.setting.SettingsActivity
@@ -28,18 +30,18 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         supportActionBar?.title = resources.getString(R.string.today_schedule)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val factory = ListViewModelFactory.createFactory(this)
         viewModel = ViewModelProvider(this,factory)[HomeViewModel::class.java]
 
         viewModel.setQueryType(queryType)
-        viewModel.getNearestSchedule().observe(this) { schedule ->
-            showTodaySchedule(schedule)
-        }
+        viewModel.nearestSchedule.observe(this, ::showTodaySchedule)
     }
 
     private fun showTodaySchedule(course: Course?) {
         checkQueryType(course)
+        Log.d("HomeActivity", "showTodaySchedule: $course")
         course?.apply {
             val dayName = DayName.getByNumber(day)
             val time = String.format(getString(R.string.time_format), dayName, startTime, endTime)
@@ -79,13 +81,18 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val intent: Intent = when (item.itemId) {
-//            R.id.action_add -> Intent(this, AddCourseActivity::class.java)
+            R.id.action_add -> Intent(this, AddCourseActivity::class.java)
             R.id.action_list -> Intent(this, ListActivity::class.java)
             R.id.action_settings -> Intent(this, SettingsActivity::class.java)
             else -> null
         } ?: return super.onOptionsItemSelected(item)
 
         startActivity(intent)
+        return true
+    }
+
+    override fun onNavigateUp(): Boolean {
+        finish()
         return true
     }
 }

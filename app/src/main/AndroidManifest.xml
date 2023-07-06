@@ -16,7 +16,7 @@
         <activity
             android:name=".ui.add.AddCourseActivity"
             android:exported="false"
-            android:parentActivityName=".ui.list.ListActivity"/>
+            android:parentActivityName=".ui.home.HomeActivity"/>
         <activity
             android:name=".ui.detail.DetailActivity"
             android:label="@string/detail"
